@@ -6,6 +6,7 @@ import Switcher from "./Switcher.jsx";
 import {Formik, Field, Form, validateYupSchema} from "formik";
 import { users } from "./users.js";
 import * as Yup from 'yup';
+import Clipboard from "./Clipboard.jsx";
 
 export default function Table({ head, body, setUsers }) {
 
@@ -81,7 +82,14 @@ export default function Table({ head, body, setUsers }) {
                                 {items.map((i, tdKey) => (
                                     <td className="p-3 text-white text-sm group-hover:bg-zinc-700" key={tdKey}>
                                         {Array.isArray(i) ? i : isEditModeActive ?
-                                            <input className="text-white border border-zinc-600 p-1 bg-zinc-800 rounded" type="text" value={i}/> :i}
+                                            (typeof i === "string" && i.includes("@") ? <div className="flex items-center">
+                                                <input className="text-white border border-zinc-600 p-1 bg-zinc-800 rounded mr-2" type="text" value={i}/>
+                                                <Clipboard i={i} />
+                                            </div> : <input className="text-white border border-zinc-600 p-1 bg-zinc-800 rounded" type="text" value={i}/>) :
+                                            (typeof i === "string" && i.includes("@") ? <div className="flex items-center">
+                                                <span className="mr-2">{i}</span>
+                                                <Clipboard i={i} />
+                                            </div> : i)}
                                     </td>
                                 ))}
                             </tr>

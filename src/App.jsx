@@ -2,10 +2,9 @@ import Table from "./Table.jsx";
 import { users } from "./users.js";
 import { useState } from "react";
 
-// TODO, copy email when clicked
-
-// BUG, when you delete all users, it shows 2 error at the same time
-// BUG, empty add user fields after submit
+// TODO [FEATURE] copy email when it's clicked
+// TODO [BUG] when you delete all users, it shows 2 error at the same time
+// TODO [BUG] empty add user fields after submit
 
 function App() {
 
@@ -40,5 +39,3 @@ function App() {
 }
 
 export default App
-
-// "name-surname", "e-mail", "age", "actions"
