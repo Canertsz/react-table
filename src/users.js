@@ -1,4 +1,4 @@
-export const users = [
+export let users = [
     {
         fullName: "Caner Tüysüz",
         email: "canertuysuz6@gmail.com",
@@ -18,5 +18,5 @@ export const users = [
         fullName: "Taha Seçilmiş",
         email: "tahasclms@gmail.com",
         age: 21
-    },
+    }
 ]
