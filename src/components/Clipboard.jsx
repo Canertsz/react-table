@@ -1,18 +1,24 @@
 import { BsFillClipboardFill } from "react-icons/Bs"
+import { useState } from "react";
 
 export default function Clipboard({ i }) {
+
+    const [isClicked, setIsClicked] = useState(false)
 
     const writeTextInClipboard = () => {
         navigator.clipboard.writeText(i)
             .then(() => {
-                console.log('Text copied to clipboard');
+                setIsClicked(true)
             })
-            .catch(err => {
-                console.error('Failed to copy text: ', err);
-            });
+
     };
 
+    isClicked === true ? setTimeout(() => setIsClicked(false), 500) : null
+
     return (
-        <BsFillClipboardFill style={{cursor: "pointer"}} onClick={writeTextInClipboard} />
+        <BsFillClipboardFill
+            style={{cursor: "pointer"}}
+            className={isClicked ? "transition-all text-green-400" : "transition-all"}
+            onClick={writeTextInClipboard} />
     )
 }
