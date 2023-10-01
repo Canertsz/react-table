@@ -1,6 +1,11 @@
 import React, { useState } from "react"
 
-const Switcher = ({ isEditModeActive, setIsEditModeActive }) => {
+interface SwitcherProps {
+  isEditModeActive: boolean
+  setIsEditModeActive: React.Dispatch<React.SetStateAction<boolean>>
+}
+
+const Switcher = ({ isEditModeActive, setIsEditModeActive }: SwitcherProps) => {
   const [isChecked, setIsChecked] = useState(false)
 
   const handleCheckboxChange = () => {

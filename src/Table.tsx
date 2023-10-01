@@ -7,24 +7,31 @@ import TableMobile from "./TableMobile.jsx"
 import Switcher from "./components/Switcher.tsx"
 import Clipboard from "./components/Clipboard.tsx"
 import * as Yup from "yup"
-import { TableHeader, TableBody, UsersType, AddUserSchema } from "./types.ts"
+import {
+  TableHeader,
+  TableBody,
+  UsersType,
+  AddUserSchema,
+  SortingState,
+} from "./types.ts"
 
-type TableProps = {
+interface TableProps {
   head: TableHeader[]
   body: TableBody[] | null
   setUsers: React.Dispatch<React.SetStateAction<UsersType[] | null>>
 }
-
-type SortingState = boolean | { key: number; orderBy: "asc" | "dsc" }
 
 export default function Table({
   head,
   body,
   setUsers,
 }: TableProps): JSX.Element {
-  const [search, setSearch] = useState<string>("")
+  const [search, setSearch] = useState<string | number>("")
   const [isEditModeActive, setIsEditModeActive] = useState<boolean>(false)
-  const [sorting, setSorting] = useState<SortingState>(false)
+  const [sorting, setSorting] = useState<SortingState>({
+    key: null,
+    orderBy: null,
+  })
   const isMobile = useMediaQuery("(max-width: 555px)")
 
   const filteredData = body
@@ -34,12 +41,16 @@ export default function Table({
             i
               .toString()
               .toLocaleLowerCase("TR")
-              .includes(search.toLocaleLowerCase("TR")),
+              .includes(
+                typeof search === "number"
+                  ? search.toString().toLocaleLowerCase("TR")
+                  : search.toLocaleLowerCase("TR"),
+              ),
           ),
         )
         .sort((a: any, b: any) => {
           console.log(a, b)
-          if (typeof sorting === "object") {
+          if (sorting.key !== null) {
             if (sorting.orderBy === "asc") {
               return a[sorting.key].toString().localeCompare(b[sorting.key])
             }
@@ -70,10 +81,10 @@ export default function Table({
           placeholder="search user"
           onChange={(e) => setSearch(e.target.value)}
         />
-        {sorting && (
+        {sorting.key !== null && (
           <button
             className="h-10 w-36 rounded wihtespace-nowrap text-sm px-4 py-2 border border-zinc-500 text-red-400"
-            onClick={() => setSorting(false)}
+            onClick={() => setSorting({ key: null, orderBy: null })}
           >
             cancel sort
           </button>
@@ -99,24 +110,20 @@ export default function Table({
                       <button
                         className="ml-1"
                         onClick={() => {
-                          if (typeof sorting === "object") {
-                            setSorting({
-                              key,
-                              orderBy:
-                                sorting.orderBy === "asc" ? "dsc" : "asc",
-                            })
-                          }
+                          setSorting({
+                            key,
+                            orderBy: sorting.orderBy === "asc" ? "dsc" : "asc",
+                          })
                         }}
                       >
-                        {typeof sorting === "object" &&
+                        {sorting.key !== null &&
                           sorting.key === key &&
                           (sorting.orderBy === "asc" ? (
                             <FaSortDown />
                           ) : (
                             <FaSortUp />
                           ))}
-                        {typeof sorting === "object" &&
-                          sorting?.key !== key && <FaSort />}
+                        {sorting && sorting?.key !== key && <FaSort />}
                       </button>
                     )}
                   </div>
@@ -148,7 +155,7 @@ export default function Table({
                         <input
                           className="text-white border border-zinc-600 p-1 bg-zinc-800 rounded"
                           type="text"
-                          value={i as string}
+                          value={i as string | number}
                         />
                       )
                     ) : typeof i === "string" && i.includes("@") ? (

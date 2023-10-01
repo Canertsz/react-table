@@ -2,6 +2,19 @@ import * as Yup from "yup"
 import { Field, Form, Formik } from "formik"
 import { users } from "./users.js"
 import Clipboard from "./components/Clipboard.jsx"
+import { TableHeader, TableBody, SortingState, UsersType } from "./types.js"
+
+interface TableMobileProps {
+  head: TableHeader[]
+  filteredData: TableBody[] | null
+  search: string | number
+  setSearch: React.Dispatch<React.SetStateAction<string | number>>
+  sorting: SortingState
+  setSorting: React.Dispatch<React.SetStateAction<SortingState>>
+  setUsers: React.Dispatch<React.SetStateAction<UsersType[] | null>>
+  isEditModeActive: boolean
+  setIsEditModeActive: React.Dispatch<React.SetStateAction<boolean>>
+}
 
 export default function TableMobile({
   head,
@@ -13,7 +26,7 @@ export default function TableMobile({
   setUsers,
   isEditModeActive,
   setIsEditModeActive,
-}) {
+}: TableMobileProps): JSX.Element {
   const addUserSchema = Yup.object().shape({
     name: Yup.string()
       .min(6, "Too Short!")
@@ -36,52 +49,53 @@ export default function TableMobile({
         {sorting && (
           <button
             className="h-10 w-36 rounded wihtespace-nowrap text-sm px-4 py-2 border border-zinc-500 text-red-400"
-            onClick={() => setSorting(false)}
+            onClick={() => setSorting({ key: null, orderBy: null })}
           >
             cancel sort
           </button>
         )}
       </div>
       <div className="border border-zinc-700 rounded grid divide-y divide-zinc-700 gap-y-4 p-4 mt-4">
-        {filteredData.map((items, key) => (
-          <section className="pt-4 first:pt-0">
-            {items.map((i, key) => (
-              <div className="text-sm text-white flex items-center gap-x-6">
-                <h6 className="min-w-[150px] text-xs font-semibold text-gray-300">
-                  {head[key].title === "actions" ? "" : head[key].title}
-                </h6>
-                {Array.isArray(i) ? (
-                  <span className="text-xs mt-2">{i}</span>
-                ) : isEditModeActive ? (
-                  typeof i === "string" && i.includes("@") ? (
-                    <div className="flex items-center text-xs">
+        {filteredData &&
+          filteredData.map((items, key) => (
+            <section className="pt-4 first:pt-0">
+              {items.map((i, key) => (
+                <div className="text-sm text-white flex items-center gap-x-6">
+                  <h6 className="min-w-[150px] text-xs font-semibold text-gray-300">
+                    {head[key].title === "actions" ? "" : head[key].title}
+                  </h6>
+                  {Array.isArray(i) ? (
+                    <span className="text-xs mt-2">{i}</span>
+                  ) : isEditModeActive ? (
+                    typeof i === "string" && i.includes("@") ? (
+                      <div className="flex items-center text-xs">
+                        <input
+                          className="text-white border border-zinc-600 p-1 bg-zinc-800 rounded mr-2"
+                          type="text"
+                          value={i}
+                        />
+                        <Clipboard i={i} />
+                      </div>
+                    ) : (
                       <input
-                        className="text-white border border-zinc-600 p-1 bg-zinc-800 rounded mr-2"
+                        className="text-white text-xs border border-zinc-600 p-1 bg-zinc-800 rounded"
                         type="text"
-                        value={i}
+                        value={i as string | number}
                       />
+                    )
+                  ) : typeof i === "string" && i.includes("@") ? (
+                    <div className="flex items-center text-xs">
+                      <span className="mr-2 text-xs">{i}</span>
                       <Clipboard i={i} />
                     </div>
                   ) : (
-                    <input
-                      className="text-white text-xs border border-zinc-600 p-1 bg-zinc-800 rounded"
-                      type="text"
-                      value={i}
-                    />
-                  )
-                ) : typeof i === "string" && i.includes("@") ? (
-                  <div className="flex items-center text-xs">
-                    <span className="mr-2 text-xs">{i}</span>
-                    <Clipboard i={i} />
-                  </div>
-                ) : (
-                  <span className="text-xs">{i}</span>
-                )}
-              </div>
-            ))}
-          </section>
-        ))}
-        {filteredData.length === 0 && (
+                    <span className="text-xs">{i}</span>
+                  )}
+                </div>
+              ))}
+            </section>
+          ))}
+        {filteredData && filteredData.length === 0 && (
           <div className="italic text-slate-400 m-2">
             We couldn't find any results for "{search}"
           </div>
@@ -109,7 +123,7 @@ export default function TableMobile({
               : users.push({
                   fullName: values.name,
                   email: values.email,
-                  age: values.age,
+                  age: +values.age,
                 })
 
             setUsers([...users])
@@ -120,7 +134,6 @@ export default function TableMobile({
           validationSchema={addUserSchema}
         >
           {({ errors, touched }) => (
-            // TODO: NEEDS REFACTOR
 
             <Form>
               <div className="flex mt-4 gap-x-8">

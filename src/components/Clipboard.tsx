@@ -1,8 +1,12 @@
 import { BsFillClipboardFill } from "react-icons/Bs"
 import { useState } from "react"
 
-export default function Clipboard({ i }) {
-  const [isClicked, setIsClicked] = useState(false)
+interface ClipboardProps {
+  i: string
+}
+
+export default function Clipboard({ i }: ClipboardProps) {
+  const [isClicked, setIsClicked] = useState<boolean>(false)
 
   const writeTextInClipboard = () => {
     navigator.clipboard.writeText(i).then(() => {
